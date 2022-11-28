@@ -73,10 +73,73 @@ class ViewController: UIViewController
     
     @IBAction func equalTap(_ sender: Any)
     {
-        let expression = NSExpression(format: workings)
-        let result = expression.expressionValue(with: nil, context: nil) as! Double
-        let resultString = formatResult(result: result)
-        calculatorResults.text = resultString
+        if(validInput())
+        {
+            let checkedWorkingsForPercent = workings.replacingOccurrences(of: "%", with: "*0.01")
+            let expression = NSExpression(format: checkedWorkingsForPercent)
+            let result = expression.expressionValue(with: nil, context: nil) as! Double
+            let resultString = formatResult(result: result)
+            calculatorResults.text = resultString
+        }
+        else
+        {
+            let alert = UIAlertController(title: "Invalid Input", message: "Please enter a valid input value", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: .default))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    func validInput() -> Bool
+    {
+        var count = 0
+        var funcCharIndexes = [Int]()
+        
+        for char in workings
+        {
+            if(specialCharacter(char: char))
+            {
+                funcCharIndexes.append(count)
+            }
+            count += 1
+        }
+        var previous:Int = -1
+        
+        for index in funcCharIndexes
+        {
+            if(index == 0)
+            {
+                return true
+            }
+            if(index == workings.count - 1 )
+            {
+                return false
+            }
+            if(previous != -1)
+            {
+                if(index - previous == 1)
+                {
+                    return false
+                }
+            }
+            previous = index
+        }
+        
+        return true
+    }
+    func specialCharacter(char: Character) -> Bool
+    {
+        if(char == "*")
+        {
+            return true
+        }
+        if(char == "/")
+        {
+            return true
+        }
+        if(char == "+")
+        {
+            return true
+        }
+        return false
     }
     
     func formatResult(result: Double) -> String
